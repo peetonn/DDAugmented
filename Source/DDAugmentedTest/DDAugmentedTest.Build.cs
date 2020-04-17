@@ -1,16 +1,16 @@
 //
-// <#Module Name#>.Build.cs
+// DDAugmentedTest.Build.cs
 //
-//  Generated on <#generation date#>
+//  Generated on April 17 2020
 //  Template created by Peter Gusev on 27 January 2020.
 //  Copyright 2013-2019 Regents of the University of California
 //
 
 using UnrealBuildTool;
 
-public class <#Module Name#> : ModuleRules
+public class DDAugmentedTest : ModuleRules
 {
-	public <#Module Name#>(ReadOnlyTargetRules Target) : base(Target)
+	public DDAugmentedTest(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
@@ -33,6 +33,7 @@ public class <#Module Name#> : ModuleRules
 			{
 				"Core",
 				"UMG",
+				"DDAugmented",
 				"DDBase",
 				"DDLog"
 				// ... add other public dependencies that you statically link with here ...
@@ -47,7 +48,7 @@ public class <#Module Name#> : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-				"deps<#Module Name#>"
+				"depsDDAugmented"
 				// ... add private dependencies that you statically link with here ...
 			}
 			);

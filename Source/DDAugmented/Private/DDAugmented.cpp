@@ -1,12 +1,12 @@
 //
-// <#Module Name#>Test.cpp
+// DDAugmented.cpp
 //
-//  Generated on <#generation date#>
+//  Generated on April 17 2020
 //  Template created by Peter Gusev on 27 January 2020.
 //  Copyright 2013-2019 Regents of the University of California
 //
 
-#include "<#Module Name#>Test.h"
+#include "DDAugmented.h"
 #include "logging.hpp"
 #include "git-describe.h"
 
@@ -14,10 +14,10 @@
 #define STRINGIZE_TOKEN(t) #t
 #define PLUGIN_VERSION STRINGIZE_VERSION(GIT_DESCRIBE)
 
-#define MODULE_NAME "<#Module Name#>Test"
-#define LOCTEXT_NAMESPACE "F<#Module Name#>TestModule"
+#define MODULE_NAME "DDAugmented"
+#define LOCTEXT_NAMESPACE "FDDAugmentedModule"
 
-void F<#Module Name#>TestModule::StartupModule()
+void FDDAugmentedModule::StartupModule()
 {
     initModule(MODULE_NAME, PLUGIN_VERSION);
 
@@ -31,7 +31,7 @@ void F<#Module Name#>TestModule::StartupModule()
     // This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 }
 
-void F<#Module Name#>TestModule::ShutdownModule()
+void FDDAugmentedModule::ShutdownModule()
 {
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
@@ -39,4 +39,4 @@ void F<#Module Name#>TestModule::ShutdownModule()
 
 #undef LOCTEXT_NAMESPACE
 
-IMPLEMENT_MODULE(F<#Module Name#>TestModule, <#Module Name#>Test)
+IMPLEMENT_MODULE(FDDAugmentedModule, DDAugmented)

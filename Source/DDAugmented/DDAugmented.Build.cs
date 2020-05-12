@@ -47,6 +47,8 @@ public class DDAugmented : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
+                "ProceduralMeshComponent",
+                "AugmentedReality",
 				"depsDDAugmented"
 				// ... add private dependencies that you statically link with here ...
 			}

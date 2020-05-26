@@ -27,6 +27,9 @@ struct FTrackingInfo {
     
     UPROPERTY(BlueprintReadWrite)
     EARWorldMappingState WorldMappingState;
+    
+    UPROPERTY(BlueprintReadWrite)
+    FTransform TrackingAlignment;
 };
 
 USTRUCT(Blueprintable)
@@ -116,6 +119,9 @@ public:
     
     UFUNCTION(Client, Reliable, BlueprintCallable)
     void ClientSetPawnAdjustment(FTransform adjustmentTransform);
+    
+    UFUNCTION(Client, Reliable, BlueprintCallable)
+    void ClientSetAlignmentAdjustment(FTransform adjustmentTransform);
     
     UFUNCTION(Server, Reliable, BlueprintCallable)
     void ServerAddTrackedImage(FTrackedImageData tImage);

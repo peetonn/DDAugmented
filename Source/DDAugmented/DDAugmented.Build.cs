@@ -49,6 +49,7 @@ public class DDAugmented : ModuleRules
 				"SlateCore",
                 "ProceduralMeshComponent",
                 "AugmentedReality",
+                "GrasshopperAR",
 				"depsDDAugmented"
 				// ... add private dependencies that you statically link with here ...
 			}

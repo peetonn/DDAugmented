@@ -3,6 +3,7 @@
 
 #include "AugmentedDebugger.h"
 #include "DDLog.h"
+#include "ARBasePlayerController.h"
 #include <Net/UnrealNetwork.h>
 #include <Math/UnrealMathUtility.h>
 
@@ -105,6 +106,17 @@ void UAugmentedDebugger::ClientSetPawnAdjustment_Implementation(FTransform adjus
     else
         DLOG_MODULE_WARN(DDAugmented, "Can't adjust pawn -- it is NULL");
 
+}
+
+void UAugmentedDebugger::ClientSetAlignmentAdjustment_Implementation(FTransform adjustmentTransform)
+{
+    if (ArPawn)
+    {
+        DLOG_MODULE_TRACE(DDAugmented, "Update AR alignment by {}",
+                      TCHAR_TO_ANSI(*adjustmentTransform.ToHumanReadableString()));
+
+        Cast<AARBasePlayerController>(ArController)->updateArAlignment(adjustmentTransform);
+    }
 }
 
 void UAugmentedDebugger::ServerAddTrackedImage_Implementation(FTrackedImageData tImage)

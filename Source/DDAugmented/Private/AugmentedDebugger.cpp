@@ -155,6 +155,7 @@ void UAugmentedDebugger::ServerUpdateTrackedImage_Implementation(FTrackedImageDa
         updateImageData->EstimatedSize = tImage.EstimatedSize;
         updateImageData->TrackingState = tImage.TrackingState;
         updateImageData->ImageName = tImage.ImageName;
+        updateImageData->PickedForEstimation = tImage.PickedForEstimation;
     }
 }
 

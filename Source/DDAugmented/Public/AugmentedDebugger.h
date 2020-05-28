@@ -54,6 +54,9 @@ struct FTrackedImageData {
     
     UPROPERTY(BlueprintReadWrite)
     FGuid id_;
+    
+    UPROPERTY(BlueprintReadWrite)
+    bool PickedForEstimation;
 };
 
 UCLASS(ClassGroup=(DDAugmentedUI),Blueprintable, meta=(BlueprintSpawnableComponent))

@@ -30,9 +30,6 @@ void UAugmentedDebugger::BeginPlay()
 {
     Super::BeginPlay();
     
-    DLOG_MODULE_TRACE(DDAugmented, "UAugmentedDebugger. role {} remote role {}",
-                      GetOwnerRole(), GetOwner()->GetRemoteRole());
-    
     // if we are authoritative -- spawn plane renderer. this spawn
     // will be replicated automatically to all clients
     if (GetOwnerRole() >= ROLE_Authority)
@@ -40,6 +37,11 @@ void UAugmentedDebugger::BeginPlay()
         ServerSpawnPlaneRenderer();
         OnNotify_PlaneRendererSpawned();
     }
+    
+    isRenderingPawn = true;
+    isRenderingCamera = true;
+    isRenderingTrackOrigin = true;
+    isRenderingImages = true;
 }
 
 
@@ -121,41 +123,50 @@ void UAugmentedDebugger::ClientSetAlignmentAdjustment_Implementation(FTransform 
 
 void UAugmentedDebugger::ServerAddTrackedImage_Implementation(FTrackedImageData tImage)
 {
-    DLOG_MODULE_TRACE(DDAugmented, "Add New TrackedImage {} - {}, transform: {}",
-                     TCHAR_TO_ANSI(*tImage.id_.ToString()),
-                     TCHAR_TO_ANSI(*tImage.ImageName),
-                     TCHAR_TO_ANSI(*tImage.PawnToImage.ToHumanReadableString()));
-    TrackedImages.Add(tImage);
+    if (GetNetMode() != NM_Standalone)
+    {
+        DLOG_MODULE_TRACE(DDAugmented, "Add New TrackedImage {} - {}, transform: {}",
+                          TCHAR_TO_ANSI(*tImage.id_.ToString()),
+                          TCHAR_TO_ANSI(*tImage.ImageName),
+                          TCHAR_TO_ANSI(*tImage.PawnToImage.ToHumanReadableString()));
+        TrackedImages.Add(tImage);
+    }
 }
 
 void UAugmentedDebugger::ServerRemoveTrackedImage_Implementation(const TArray<FString>& imageIds)
 {
-    DLOG_MODULE_TRACE(DDAugmented, "Removing {} old tracked image", imageIds.Num());
-    
-    TrackedImages.RemoveAll([imageIds](FTrackedImageData v){
-        return imageIds.Contains(v.id_.ToString());
-    });
+    if (GetNetMode() != NM_Standalone)
+    {
+        DLOG_MODULE_TRACE(DDAugmented, "Removing {} old tracked image", imageIds.Num());
+        
+        TrackedImages.RemoveAll([imageIds](FTrackedImageData v){
+            return imageIds.Contains(v.id_.ToString());
+        });
+    }
 }
 
 void UAugmentedDebugger::ServerUpdateTrackedImage_Implementation(FTrackedImageData tImage)
 {
-//    DLOG_MODULE_TRACE(DDAugmented, "Update TrackedImage {} - {}, transform: {}",
-//                     TCHAR_TO_ANSI(*tImage.id_.ToString()),
-//                     TCHAR_TO_ANSI(*tImage.ImageName),
-//                     TCHAR_TO_ANSI(*tImage.PawnToImage.ToHumanReadableString()));
-    
-    auto* updateImageData =
-    TrackedImages.FindByPredicate([&tImage](const FTrackedImageData& img){
-        return tImage.id_.ToString().Equals(img.id_.ToString());
-    });
-    
-    if (updateImageData)
+    if (GetNetMode() != NM_Standalone)
     {
-        updateImageData->PawnToImage = tImage.PawnToImage;
-        updateImageData->EstimatedSize = tImage.EstimatedSize;
-        updateImageData->TrackingState = tImage.TrackingState;
-        updateImageData->ImageName = tImage.ImageName;
-        updateImageData->PickedForEstimation = tImage.PickedForEstimation;
+        //    DLOG_MODULE_TRACE(DDAugmented, "Update TrackedImage {} - {}, transform: {}",
+        //                     TCHAR_TO_ANSI(*tImage.id_.ToString()),
+        //                     TCHAR_TO_ANSI(*tImage.ImageName),
+        //                     TCHAR_TO_ANSI(*tImage.PawnToImage.ToHumanReadableString()));
+        
+        auto* updateImageData =
+        TrackedImages.FindByPredicate([&tImage](const FTrackedImageData& img){
+            return tImage.id_.ToString().Equals(img.id_.ToString());
+        });
+        
+        if (updateImageData)
+        {
+            updateImageData->PawnToImage = tImage.PawnToImage;
+            updateImageData->EstimatedSize = tImage.EstimatedSize;
+            updateImageData->TrackingState = tImage.TrackingState;
+            updateImageData->ImageName = tImage.ImageName;
+            updateImageData->PickedForEstimation = tImage.PickedForEstimation;
+        }
     }
 }
 

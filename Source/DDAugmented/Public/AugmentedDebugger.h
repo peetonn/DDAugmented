@@ -36,10 +36,6 @@ USTRUCT(Blueprintable)
 struct FTrackedImageData {
     GENERATED_BODY();
     
-//    FTrackedImageData() {
-//        id_ = FGuid::NewGuid();
-//    }
-    
     UPROPERTY(BlueprintReadWrite)
     FTransform PawnToImage;
     
@@ -138,6 +134,13 @@ public:
     UFUNCTION(BlueprintCallable)
     FTrackedImageData MakeNewTrackedImageData() const;
     
+    UFUNCTION(BlueprintCallable)
+    void SnapFiducials(const FString& fileName, bool onlyTracking = false) const;
+    
+    UFUNCTION(Server, Reliable, BlueprintCallable)
+    void ServerSnapFiducials(const FString& fileName, bool onlyTracking = false) const;
+    
+    
 protected:
     // Called when the game starts
     virtual void BeginPlay() override;
@@ -146,5 +149,7 @@ private:
     
     UFUNCTION()
     void OnRep_PlaneRenderer();
+    
+    void SaveLoadTrackedImage(FArchive& Ar, FTrackedImageData& imageData) const;
     
 };

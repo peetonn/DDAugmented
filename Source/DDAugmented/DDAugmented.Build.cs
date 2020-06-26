@@ -34,7 +34,8 @@ public class DDAugmented : ModuleRules
 				"Core",
 				"UMG",
 				"DDBase",
-				"DDLog"
+				"DDLog",
+                "DDBlueprints"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

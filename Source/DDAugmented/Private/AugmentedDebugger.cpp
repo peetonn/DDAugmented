@@ -3,6 +3,7 @@
 
 #include "AugmentedDebugger.h"
 #include "DDLog.h"
+#include "DDBlueprintLibrary.h"
 #include "ARBasePlayerController.h"
 #include <Net/UnrealNetwork.h>
 #include <Math/UnrealMathUtility.h>
@@ -180,5 +181,54 @@ FTrackedImageData UAugmentedDebugger::MakeNewTrackedImageData() const
     FTrackedImageData data;
     data.id_ = guid;
     return data;
+}
+
+void UAugmentedDebugger::SnapFiducials(const FString& fileName, bool onlyTracking) const
+{
+    FString writeablePath = UDDBlueprintLibrary::GetCrossPlatformWriteableFolder();
+    FBufferArchive binArchive;
+    int nSerialized = 0;
+    
+    for (auto image : TrackedImages)
+    {
+        if (onlyTracking && image.TrackingState != EARTrackingState::Tracking)
+            continue;
+        
+        SaveLoadTrackedImage(binArchive, image);
+        nSerialized += 1;
+    }
+    
+    if (binArchive.Num() <= 0)
+        DLOG_MODULE_WARN(DDAugmented, "Fiducial snapshot is empty");
+    else
+    {
+        FString filePath = writeablePath + "/" + fileName;
+        // save to a file
+        bool res = FFileHelper::SaveArrayToFile(binArchive, *filePath);
+        
+        binArchive.FlushCache();
+        binArchive.Empty();
+        
+        if (!res)
+            DLOG_MODULE_ERROR(DDAugmented, "Failed to save to file {}", TCHAR_TO_ANSI(*filePath));
+        else
+            DLOG_MODULE_DEBUG(DDAugmented, "Succesfully saved {} fiducial snapshots to file {}",
+                              nSerialized,
+                              TCHAR_TO_ANSI(*filePath));
+    }
+    
+    if (GetNetMode() == NM_Client)
+        ServerSnapFiducials(fileName, onlyTracking);
+}
+
+void UAugmentedDebugger::ServerSnapFiducials_Implementation(const FString& fileName, bool onlyTracking = false) const
+{
+    SnapFiducials(fileName, onlyTracking);
+}
+
+void UAugmentedDebugger::SaveLoadTrackedImage(FArchive& Ar, FTrackedImageData& imageData) const
+{
+    Ar << imageData.ImageName;
+    Ar << imageData.PawnToImage;
 }
 

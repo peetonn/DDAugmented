@@ -16,14 +16,12 @@ public class DDAugmented : ModuleRules
 
 		PublicIncludePaths.AddRange(
 			new string[] {
-				// ... add public include paths required here ...
 			}
 			);
 
 
 		PrivateIncludePaths.AddRange(
 			new string[] {
-				// ... add other private include paths required here ...
 			}
 			);
 
@@ -35,8 +33,8 @@ public class DDAugmented : ModuleRules
 				"UMG",
 				"DDBase",
 				"DDLog",
-                "DDBlueprints"
-				// ... add other public dependencies that you statically link with here ...
+                "DDBlueprints",
+                "ProceduralMeshComponent"
 			}
 			);
 
@@ -48,11 +46,9 @@ public class DDAugmented : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-                "ProceduralMeshComponent",
                 "AugmentedReality",
                 "GrasshopperAR",
 				"depsDDAugmented"
-				// ... add private dependencies that you statically link with here ...
 			}
 			);
 
@@ -60,7 +56,6 @@ public class DDAugmented : ModuleRules
 		DynamicallyLoadedModuleNames.AddRange(
 			new string[]
 			{
-				// ... add any modules that your module loads dynamically here ...
 			}
 			);
 	}

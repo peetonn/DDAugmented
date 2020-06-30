@@ -185,37 +185,13 @@ FTrackedImageData UAugmentedDebugger::MakeNewTrackedImageData() const
 
 void UAugmentedDebugger::SnapFiducials(const FString& fileName, bool onlyTracking) const
 {
-    FString writeablePath = UDDBlueprintLibrary::GetCrossPlatformWriteableFolder();
-    FBufferArchive binArchive;
-    int nSerialized = 0;
+    FString filePath = UDDBlueprintLibrary::GetCrossPlatformWriteableFolder() + "/" + fileName;
     
-    for (auto image : TrackedImages)
-    {
-        if (onlyTracking && image.TrackingState != EARTrackingState::Tracking)
-            continue;
-        
-        SaveLoadTrackedImage(binArchive, image);
-        nSerialized += 1;
-    }
+    TArray<FTrackedImageData> imageData = TrackedImages.FilterByPredicate([&](const FTrackedImageData& img){
+        return onlyTracking ? img.TrackingState == EARTrackingState::Tracking : true;
+    });
     
-    if (binArchive.Num() <= 0)
-        DLOG_MODULE_WARN(DDAugmented, "Fiducial snapshot is empty");
-    else
-    {
-        FString filePath = writeablePath + "/" + fileName;
-        // save to a file
-        bool res = FFileHelper::SaveArrayToFile(binArchive, *filePath);
-        
-        binArchive.FlushCache();
-        binArchive.Empty();
-        
-        if (!res)
-            DLOG_MODULE_ERROR(DDAugmented, "Failed to save to file {}", TCHAR_TO_ANSI(*filePath));
-        else
-            DLOG_MODULE_DEBUG(DDAugmented, "Succesfully saved {} fiducial snapshots to file {}",
-                              nSerialized,
-                              TCHAR_TO_ANSI(*filePath));
-    }
+    SaveFiducialImages(filePath, imageData);
     
     if (GetNetMode() == NM_Client)
         ServerSnapFiducials(fileName, onlyTracking);
@@ -226,9 +202,77 @@ void UAugmentedDebugger::ServerSnapFiducials_Implementation(const FString& fileN
     SnapFiducials(fileName, onlyTracking);
 }
 
-void UAugmentedDebugger::SaveLoadTrackedImage(FArchive& Ar, FTrackedImageData& imageData) const
+bool UAugmentedDebugger::SaveFiducialImages(const FString& savePath,
+const TArray<FTrackedImageData>& imageData)
+{
+    FBufferArchive binArchive;
+    int nSerialized = 0;
+    
+    if (imageData.Num())
+    {
+        int nFiducials = imageData.Num();
+        binArchive << nFiducials;
+    }
+
+    for (auto image : imageData)
+    {
+        SaveLoadTrackedImage(binArchive, image);
+        nSerialized += 1;
+    }
+    
+    if (binArchive.Num() <= 0)
+        DLOG_MODULE_WARN(FiducialRelocalizer, "Fiducial snapshot is empty");
+    else
+    {
+        // save to a file
+        bool res = FFileHelper::SaveArrayToFile(binArchive, *savePath);
+        
+        binArchive.FlushCache();
+        binArchive.Empty();
+        
+        if (!res)
+            DLOG_MODULE_ERROR(FiducialRelocalizer, "Failed to save to file {}", TCHAR_TO_ANSI(*savePath));
+        else
+            DLOG_MODULE_DEBUG(FiducialRelocalizer, "Succesfully saved {} fiducial snapshots to file {}",
+                              nSerialized,
+                              TCHAR_TO_ANSI(*savePath));
+        
+        return res;
+    }
+    
+    return false;
+}
+
+bool UAugmentedDebugger::LoadFiducialImages(const FString& loadPath, TArray<FTrackedImageData>& imageData)
+{
+    TArray<uint8> BinaryArray;
+    
+    if (!FFileHelper::LoadFileToArray(BinaryArray, *loadPath)) return false;
+    
+    if (BinaryArray.Num() <= 0) return false;
+    
+    FMemoryReader binArchive = FMemoryReader(BinaryArray, true);
+    binArchive.Seek(0);
+    
+    int nFiducials = 0;
+    binArchive << nFiducials;
+    
+    for (int i = 0; i < nFiducials; ++i)
+    {
+        FTrackedImageData fiducial;
+        SaveLoadTrackedImage(binArchive, fiducial);
+        imageData.Add(fiducial);
+    }
+    
+    binArchive.FlushCache();
+    BinaryArray.Empty();
+    binArchive.Close();
+    
+    return true;
+}
+
+void UAugmentedDebugger::SaveLoadTrackedImage(FArchive& Ar, FTrackedImageData& imageData)
 {
     Ar << imageData.ImageName;
     Ar << imageData.PawnToImage;
 }
-

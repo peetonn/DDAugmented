@@ -140,6 +140,13 @@ public:
     UFUNCTION(Server, Reliable, BlueprintCallable)
     void ServerSnapFiducials(const FString& fileName, bool onlyTracking = false) const;
     
+    UFUNCTION(BlueprintCallable)
+    static bool SaveFiducialImages(const FString& savePath,
+                                   const TArray<FTrackedImageData>& imageData);
+    
+    UFUNCTION(BlueprintCallable)
+    static bool LoadFiducialImages(const FString& loadPath,
+                                   TArray<FTrackedImageData>& imageData);
     
 protected:
     // Called when the game starts
@@ -150,6 +157,6 @@ private:
     UFUNCTION()
     void OnRep_PlaneRenderer();
     
-    void SaveLoadTrackedImage(FArchive& Ar, FTrackedImageData& imageData) const;
+    static void SaveLoadTrackedImage(FArchive& Ar, FTrackedImageData& imageData);
     
 };

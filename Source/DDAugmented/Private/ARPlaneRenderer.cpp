@@ -49,7 +49,7 @@ void AARPlaneRenderer::Tick(float DeltaTime)
     
     // process current AR planes on mobile only
 #if PLATFORM_ANDROID || PLATFORM_IOS
-    if (Role >= ROLE_AutonomousProxy)
+    if (GetLocalRole() >= ROLE_AutonomousProxy)
     {
         if (UARBlueprintLibrary::GetTrackingQuality() == EARTrackingQuality::OrientationAndPosition)
         {
@@ -179,27 +179,21 @@ void AARPlaneRenderer::UpdatePlaneData(UARPlaneGeometry* ARCorePlaneObject)
 
 void AARPlaneRenderer::AddNewGeoData(UARPlaneGeometry* ARCorePlaneObject, UARTrackedGeoData *data)
 {
-    DLOG_MODULE_DEBUG(DDAugmented, "Adding new tracked geo data. My role {}", Role);
-    
     PlanesDataMap.Add(ARCorePlaneObject, data);
     GeoDataArray.Add(data);
     
     // call RPC here
-    if (Role == ROLE_AutonomousProxy)
+    if (GetLocalRole() == ROLE_AutonomousProxy)
     {
-        DLOG_MODULE_TRACE(DDAugmented, "My role is AutonomousProxy, calling server...");
         RPC_GeoDataAddOrRemove(true, data);
     }
 }
 
 void AARPlaneRenderer::RemoveGeoData(UARPlaneGeometry* ARCorePlaneObject, UARTrackedGeoData *data)
 {
-    DLOG_MODULE_DEBUG(DDAugmented, "Removing tracked geo data. My role {}", Role);
-    
     // call RPC here
-    if (Role == ROLE_AutonomousProxy)
+    if (GetLocalRole() == ROLE_AutonomousProxy)
     {
-        DLOG_MODULE_TRACE(DDAugmented, "My role is AutonomousProxy, calling server...");
         RPC_GeoDataAddOrRemove(false, data);
     }
     
@@ -214,7 +208,7 @@ void AARPlaneRenderer::UpdateGeoData(UARPlaneGeometry* ARCorePlaneObject, UARTra
     data->localToTracking_ = ARCorePlaneObject->GetLocalToTrackingTransform();
     
     // call RPC here
-    if (Role == ROLE_AutonomousProxy)
+    if (GetLocalRole() == ROLE_AutonomousProxy)
     {
         RPC_GeoDataUpdate(data);
     }
@@ -303,7 +297,7 @@ void AARPlaneRenderer::UpdateGeo(UARTrackedGeoData* TrackedGeoData)
 //    if(ARCorePlaneObject->GetTrackingState() == EARTrackingState::Tracking &&
 //       ARCorePlaneObject->GetSubsumedBy() == nullptr)
 //    {
-        if (!PlanePolygonMeshComponent->bVisible)
+        if (!PlanePolygonMeshComponent->IsVisible())
         {
             PlanePolygonMeshComponent->SetVisibility(true, true);
         }

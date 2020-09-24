@@ -62,7 +62,7 @@ void UAugmentedDebugger::ServerSpawnPlaneRenderer_Implementation()
     FVector pos(0);
     FRotator rot(0);
     
-    PlaneRenderer = GetWorld()->SpawnActor<AARPlaneRenderer>(pos, rot, spawnParams);
+//    PlaneRenderer = GetWorld()->SpawnActor<AARPlaneRenderer>(pos, rot, spawnParams);
 }
 
 void UAugmentedDebugger::OnNotify_PlaneRendererSpawned_Implementation()

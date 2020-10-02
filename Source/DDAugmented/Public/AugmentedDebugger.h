@@ -148,10 +148,18 @@ public:
     static bool LoadFiducialImages(const FString& loadPath,
                                    TArray<FTrackedImageData>& imageData);
     
+    UFUNCTION(BlueprintCallable)
+    FTransform GetPawnAdjustment() const { return pawnAdjustment_; }
+    
+    UFUNCTION(BlueprintCallable)
+    FTransform GetAlignemntAdjustment() const { return alignmentAdjustment_; }
+    
 protected:
     // Called when the game starts
     virtual void BeginPlay() override;
-
+    
+    FTransform pawnAdjustment_, alignmentAdjustment_;
+    
 private:
     
     UFUNCTION()

@@ -97,6 +97,8 @@ void UAugmentedDebugger::ClientSetPawnAdjustment_Implementation(FTransform adjus
         DLOG_MODULE_TRACE(DDAugmented, "Adjusting pawn by {}",
                       TCHAR_TO_ANSI(*adjustmentTransform.ToHumanReadableString()));
 
+        pawnAdjustment_ = adjustmentTransform;
+        
         FTransform pawnT = ArPawn->GetActorTransform();
         FTransform newT;
         FTransform::Multiply(&newT, &adjustmentTransform, &pawnT);
@@ -117,6 +119,8 @@ void UAugmentedDebugger::ClientSetAlignmentAdjustment_Implementation(FTransform 
         DLOG_MODULE_TRACE(DDAugmented, "Update AR alignment by {}",
                       TCHAR_TO_ANSI(*adjustmentTransform.ToHumanReadableString()));
 
+        alignmentAdjustment_ = adjustmentTransform;
+        
         Cast<AARBasePlayerController>(ArController)->updateArAlignment(adjustmentTransform);
     }
 }
